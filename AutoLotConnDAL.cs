@@ -1,6 +1,7 @@
 ﻿//using System.Data.SqlClient;
 using Microsoft.Data.SqlClient;
 using System.Configuration;
+using System.Data;
 using System.Data.Common;
 using System.Drawing;
 
@@ -30,8 +31,47 @@ namespace AutoLotConnectedLayer
         }
         public void DeleteCar(int id)
         {
+            string sql = string.Format($"delete from inventory where CarId = '{id}'");
+            using (SqlCommand cmd = new SqlCommand(sql, sqlCn))
+            {
+                try { cmd.ExecuteNonQuery(); }
+                catch (SqlException ex)
+                {
+                    Exception error = new Exception("Sorry! That car is on order!", ex);
+                    throw error;
+                }
+            }
+        }
+        public void UpdateCarPetName(int id, string newPetName)
+        {
+            string sql = string.Format($"update inventory set PetName = '{newPetName}' where CarId = '{id}'");
+            using (SqlCommand cmd = new SqlCommand(sql, sqlCn)) cmd.ExecuteNonQuery();
+        }
+        public List<NewCar> GetAllInventoryAsList()
+        {
+            List<NewCar> inv = new List<NewCar>();
+            string sql = $"select * from inventory";
+            using(SqlCommand cmd = new SqlCommand(sql, sqlCn))
+            {
+                SqlDataReader dr = cmd.ExecuteReader();
+                while (dr.Read()) inv.Add(new NewCar 
+                { CarID = (int)dr["CarId"], Color = (string)dr["Color"], Make = (string)dr["Make"], PetName = (string)dr["PetName"] });
+                dr.Close();
+            }
+            return inv;
+        }
+        public DataTable GetAllInventoryAsDataTable()
+        {
+            DataTable inv = new DataTable();
+            string sql = $"select * fron inventory";
+            using (SqlCommand cmd = new SqlCommand(sql, sqlCn))
+            {
+                SqlDataReader dr = cmd.ExecuteReader();
+                inv.Load(dr);
+                dr.Close();
+            }
 
-
+            return inv;
         }
     }
     public class NewCar

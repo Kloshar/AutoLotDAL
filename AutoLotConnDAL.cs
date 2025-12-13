@@ -21,8 +21,38 @@ namespace AutoLotConnectedLayer
         }
         public void InsertAuto(int id, string make, string color, string petName)
         {
-            string sql = string.Format("insert into inventory" + "(CarID, Make, Color, PetName)" + $"'{id}', '{make}', '{color}', '{petName}'");
-            using (SqlCommand cmd = new SqlCommand(sql, sqlCn)) cmd.ExecuteNonQuery();
+            string sql = string.Format("insert into inventory" + "(CarID, Make, Color, PetName) values " + "(@id, @make, @color, @petName)");
+            using (SqlCommand cmd = new SqlCommand(sql, sqlCn))
+            {
+                SqlParameter p = new SqlParameter();
+                p.ParameterName = "@CarID";
+                p.Value = id;
+                p.SqlDbType = SqlDbType.Int;
+                cmd.Parameters.Add(p);
+
+                p = new SqlParameter();
+                p.ParameterName = "@Make";
+                p.Value = make;
+                p.SqlDbType = SqlDbType.Char;
+                p.Size = 10;
+                cmd.Parameters.Add(p);
+
+                p = new SqlParameter();
+                p.ParameterName = "@Color";
+                p.Value = color;
+                p.SqlDbType = SqlDbType.Char;
+                p.Size = 10;
+                cmd.Parameters.Add(p);
+
+                p = new SqlParameter();
+                p.ParameterName = "@PetName";
+                p.Value = petName;
+                p.SqlDbType = SqlDbType.Char;
+                p.Size = 10;
+                cmd.Parameters.Add(p);
+
+                cmd.ExecuteNonQuery();
+            }
         }
         public void InsertAuto(NewCar car)
         {
@@ -70,8 +100,30 @@ namespace AutoLotConnectedLayer
                 inv.Load(dr);
                 dr.Close();
             }
-
             return inv;
+        }
+        public string LookUpPetName(int carID)
+        {
+            string carPetName = string.Empty;
+            using (SqlCommand cmd = new SqlCommand("GetPetName", sqlCn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                SqlParameter p = new SqlParameter();
+                p.ParameterName = "@CarID";
+                p.SqlDbType = SqlDbType.Int;
+                p.Value = carID;
+                p.Direction = ParameterDirection.Input;
+                cmd.Parameters.Add(p);
+                p = new SqlParameter();
+                p.ParameterName = "@petName";
+                p.SqlDbType = SqlDbType.Char;
+                p.Size = 10;
+                p.Direction = ParameterDirection.Output;
+                cmd.Parameters.Add(p);
+                cmd.ExecuteNonQuery();
+                carPetName = (string)cmd.Parameters["@petName"].Value;
+            }
+            return carPetName;
         }
     }
     public class NewCar

@@ -7,7 +7,7 @@ using System.Drawing;
 
 namespace AutoLotConnectedLayer
 {
-    public class InventoryDAl //DAL id Data Access Layer
+    public class InventoryDAL //DAL id Data Access Layer
     {
         private SqlConnection sqlCn = null;
         public void OpenConnection(string connectionString)

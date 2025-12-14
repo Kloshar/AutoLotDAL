@@ -93,7 +93,7 @@ namespace AutoLotConnectedLayer
         public DataTable GetAllInventoryAsDataTable()
         {
             DataTable inv = new DataTable();
-            string sql = $"select * fron inventory";
+            string sql = $"select * from inventory";
             using (SqlCommand cmd = new SqlCommand(sql, sqlCn))
             {
                 SqlDataReader dr = cmd.ExecuteReader();
